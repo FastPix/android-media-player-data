@@ -169,5 +169,5 @@ fastPixBaseMediaPlayer.setAutomaticErrorTracking(false)
 ---
 
 ## Documentation
-For advanced usage and APIs, refer to the [FastPix Developer Docs](https://docs.fastpix.io/docs/******).
+For advanced usage and APIs, refer to the [FastPix Developer Docs](https://fastpix.com/docs).
 
