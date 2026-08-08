@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FastPix MediaPlayer Sample</string>
+
+    <string name="cd_play">Play</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_forward_10">Forward 10 seconds</string>
+</resources>

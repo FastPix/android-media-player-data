@@ -19,6 +19,13 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             url = uri("https://maven.pkg.github.com/FastPix/android-core-data-sdk")
+            // GitHub Packages requires authentication even for public packages.
+            // Put gpr.user / gpr.key in ~/.gradle/gradle.properties (or pass -Pgpr.user=... -Pgpr.key=...),
+            // or export GITHUB_ACTOR / GITHUB_TOKEN in CI.
+            credentials {
+                username = settings.providers.gradleProperty("gpr.user").getOrElse(System.getenv("GITHUB_ACTOR") ?: "")
+                password = settings.providers.gradleProperty("gpr.key").getOrElse(System.getenv("GITHUB_TOKEN") ?: "")
+            }
         }
     }
 
@@ -26,3 +33,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Android Medai Player"
 include ':library'
+include ':app'
