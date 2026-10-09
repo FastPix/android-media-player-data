@@ -59,8 +59,6 @@ Native `MediaPlayer` gives you playback but no visibility into how that playback
 
 ## How the data flows
 
-![How FastPix Video Data flows from your Android MediaPlayer to the dashboard](mediaplayer-data-workflow.png)
-
 <Image alt="How FastPix Video Data flows from your Android MediaPlayer to the dashboard" border={false} src="https://static.fastpix.com/mediaplayer-data-workflow.png" />
 
 Your app plays a video on `MediaPlayer`. `FastPixBaseMediaPlayer` wraps that player, reads its listeners, and turns playback signals (play, pause, seek, buffering, errors, resolution changes) into beacons sent over HTTPS to FastPix, keyed to your workspace. A few minutes later the session appears in your FastPix dashboard as QoE and engagement analytics.
