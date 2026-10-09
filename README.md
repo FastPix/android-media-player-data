@@ -29,12 +29,13 @@ New to the SDK? Follow these steps in order and you will have analytics flowing 
 6. [Add the SDK dependency](#add-the-sdk-dependency)
 7. [Add the required permissions](#add-the-required-permissions)
 8. [Attach the SDK to your MediaPlayer](#attach-the-sdk-to-your-mediaplayer)
-9. [Verify events in your dashboard](#verify-events-in-your-dashboard)
-10. [Changing the video source](#changing-the-video-source)
-11. [Error handling](#error-handling)
-12. [Which FastPix data SDK do I need?](#which-fastpix-data-sdk-do-i-need)
-13. [FAQ](#faq)
-14. [Troubleshooting](#troubleshooting)
+9. [Run the sample app](#run-the-sample-app)
+10. [Verify events in your dashboard](#verify-events-in-your-dashboard)
+11. [Changing the video source](#changing-the-video-source)
+12. [Error handling](#error-handling)
+13. [Which FastPix data SDK do I need?](#which-fastpix-data-sdk-do-i-need)
+14. [FAQ](#faq)
+15. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -60,6 +61,8 @@ Native `MediaPlayer` gives you playback but no visibility into how that playback
 
 ![How FastPix Video Data flows from your Android MediaPlayer to the dashboard](mediaplayer-data-workflow.png)
 
+<Image alt="How FastPix Video Data flows from your Android MediaPlayer to the dashboard" border={false} src="https://static.fastpix.com/mediaplayer-data-workflow.png" />
+
 Your app plays a video on `MediaPlayer`. `FastPixBaseMediaPlayer` wraps that player, reads its listeners, and turns playback signals (play, pause, seek, buffering, errors, resolution changes) into beacons sent over HTTPS to FastPix, keyed to your workspace. A few minutes later the session appears in your FastPix dashboard as QoE and engagement analytics.
 
 ## Before you start
@@ -75,9 +78,17 @@ You will need:
 
 ## Add the GitHub Packages repositories
 
-The SDK (`io.fastpix.data:mediaplayer`) and its required core dependency (`io.fastpix.data:core`) live in **two** GitHub Packages repositories. Add **both**, or the core dependency will fail to resolve. Put your GitHub username and PAT in `gradle.properties` (or `~/.gradle/gradle.properties`, so credentials stay out of source control) and reference them here.
+The SDK (`io.fastpix.data:mediaplayer`) and its required core dependency (`io.fastpix.data:core`) live in **two** GitHub Packages repositories. Add **both**, or the core dependency will fail to resolve.
 
-In `settings.gradle`:
+Put your GitHub username and PAT in `~/.gradle/gradle.properties` (your user-level Gradle file, outside the project), so your token never lands in source control:
+
+```properties
+# ~/.gradle/gradle.properties
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=YOUR_PERSONAL_ACCESS_TOKEN
+```
+
+Then reference those properties from the project's `settings.gradle`. Both repositories read the same credentials (or the `GITHUB_ACTOR` / `GITHUB_TOKEN` environment variables in CI):
 
 ```groovy
 dependencyResolutionManagement {
@@ -87,20 +98,22 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/FastPix/android-media-player-data")
             credentials {
-                username = "<your-github-username>"
-                password = "<your-personal-access-token>"
+                username = settings.providers.gradleProperty("gpr.user").getOrElse(System.getenv("GITHUB_ACTOR") ?: "")
+                password = settings.providers.gradleProperty("gpr.key").getOrElse(System.getenv("GITHUB_TOKEN") ?: "")
             }
         }
         maven {
             url = uri("https://maven.pkg.github.com/FastPix/android-core-data-sdk")
             credentials {
-                username = "<your-github-username>"
-                password = "<your-personal-access-token>"
+                username = settings.providers.gradleProperty("gpr.user").getOrElse(System.getenv("GITHUB_ACTOR") ?: "")
+                password = settings.providers.gradleProperty("gpr.key").getOrElse(System.getenv("GITHUB_TOKEN") ?: "")
             }
         }
     }
 }
 ```
+
+> **Never commit your PAT.** Keep it in `~/.gradle/gradle.properties` or an environment variable, not in the project's `settings.gradle`.
 
 ## Add the SDK dependency
 
@@ -300,6 +313,34 @@ Every snippet below is taken verbatim from the runnable sample in this repo, [`a
         mediaPlayer = null
     }
 ```
+
+## Run the sample app
+
+This repo includes a runnable sample at [`app/`](app) that plays a video and reports analytics. To build and run it:
+
+1. Clone the repository and open it in Android Studio:
+
+   ```bash
+   git clone https://github.com/FastPix/android-media-player-data.git
+   cd android-media-player-data
+   ```
+
+2. Add your GitHub credentials to `~/.gradle/gradle.properties` (see [Add the GitHub Packages repositories](#add-the-github-packages-repositories)) so Gradle can download the SDK:
+
+   ```properties
+   gpr.user=YOUR_GITHUB_USERNAME
+   gpr.key=YOUR_PERSONAL_ACCESS_TOKEN
+   ```
+
+3. Set your Workspace Key. Open [`app/src/main/java/io/fastpix/data/mediaplayer/sample/VideoPlayerActivity.kt`](app/src/main/java/io/fastpix/data/mediaplayer/sample/VideoPlayerActivity.kt) and replace the `WORKSPACE_KEY` placeholder with the key from your [FastPix dashboard](https://dashboard.fastpix.com). To stream your own video instead of the bundled sample, also update `VIDEO_URL`.
+
+4. Select a device or emulator running Android 7.0 (API 24) or higher.
+
+5. Run the app from Android Studio, or from the command line:
+
+   ```bash
+   ./gradlew :app:installDebug
+   ```
 
 ## Verify events in your dashboard
 
